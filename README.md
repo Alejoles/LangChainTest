@@ -7,6 +7,11 @@
 
 </aside>
 
+<aside>
+📝 [Tutorials | 🦜️🔗 LangChain](https://python.langchain.com/v0.2/docs/tutorials/)
+
+</aside>
+
 ---
 
 # Instalación
@@ -25,7 +30,7 @@ Adicionalmente para este ejemplo se instalarán los paquetes para que se pueda o
 pip install langchain_openai
 ```
 
-Todo lo anterior lo podremos instalar del repositorio: [Repositorio LangChain](https://github.com/Alejoles/LangChainTest)
+Todo lo anterior lo podremos instalar del repositorio: https://github.com/Alejoles/LangChainTest
 
 ### LINUX
 
@@ -47,7 +52,9 @@ Finalmente creamos un nuevo archivo .env y configuramos las variables de entorno
 
 Para crear una api-key ingresa a [https://platform.openai.com/api-keys](https://platform.openai.com/api-keys).
 
-A continuación veremos 4 ejemplos, cada uno un poco más complejo que el anterior.
+A continuación veremos 5 ejemplos, cada uno un poco más complejo que el anterior.
+
+# Ejemplos
 
 ## Ejemplo 1 (Inicial).
 
@@ -185,3 +192,84 @@ steps, answer = parsed
 
 print(answer)
 ```
+
+## Ejemplo 5 (Chain).
+
+Veremos un ejemplo de una cadena y de por qué se llama langchain el framework
+
+```python
+from langchain_openai import ChatOpenAI
+from langchain.prompts import ChatPromptTemplate
+from langchain.schema import BaseOutputParser
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
+
+API_KEY = os.getenv("OPENAI_API_KEY")
+
+# por defecto el modelo que se usa es gpt-3.5-turbo
+chat_model = ChatOpenAI(model="gpt-3.5-turbo", api_key=API_KEY)
+
+class CommaSeparatedListOutputParser(BaseOutputParser):
+    def parse(self, text: str):
+        """ Parse the output of an LLM call. """
+        return text.strip().split(", ")
+
+template = """Eres es un útil asistente que genera listas separadas por comas.
+              Un usuario te pasa una categoría y debes generar 5 objetos de esa categoría en una lista separada por comas.
+              SOLO devuelve una lista separada por comas y nada más.
+           """
+# este {text} se va a ingresar luego en la cadena (chain)
+human_template = "{text}"
+
+chat_prompt = ChatPromptTemplate.from_messages([
+    ("system", template),
+    ("human", human_template)
+])
+
+# CHAIN
+chain = chat_prompt | chat_model | CommaSeparatedListOutputParser()
+# El text es del template que se realizó en la línea 24
+result = chain.invoke({"text": "colors"})
+print(result)
+```
+
+Para ser un poco más explícitos, la cadena indica el orden en el que se hacen las cosas y para esto usamos el operador “|” que en la sintaxis de langchain funciona para realizar la cadena.
+
+```python
+chain = chat_prompt | chat_model | CommaSeparatedListOutputParser()
+result = chain.invoke({"text": "colors"})
+```
+
+En primera instancia se crea el prompt que sería el template que se le envía al modelo, por ende lo segundo que se realiza es entrenar el modelo y finalmente se hace un parsing a la respuesta que da el modelo y obtenemos lo que necesitamos.
+
+- Le pasamos el chat generado por el template.
+- Se lo pasamos al modelo para entrenarlo.
+- Y pasamos la respuesta al parser.
+- Finalmente obtenemos respuesta.
+
+# SQL
+
+<aside>
+📝 [SQL Database | 🦜️🔗 LangChain](https://python.langchain.com/v0.2/docs/integrations/toolkits/sql_database/)
+
+</aside>
+
+LangChain se puede conectar a fuentes de datos, como bases de datos.
+
+Lo que podemos hacer es que se conecte a una base de datos y con lenguaje natural pedirle que haga querys y nos de un resultado. CUIDADO, los prompts pueden llegar a modificar la base de datos por lo que siempre hay que tener cuidado con datos sensibles, siempre debemos tener una copia de seguridad y evitar dar permisos de escritura a una base de datos que le pasamos al modelo.
+
+# Ejemplo de como crear un sistema de preguntas y respuestas con una base de datos SQL
+
+<aside>
+📝 [Build a Question/Answering system over SQL data | 🦜️🔗 LangChain](https://python.langchain.com/v0.2/docs/tutorials/sql_qa/#chains)
+
+</aside>
+
+# Herramientas interesantes
+
+<aside>
+📝 [Hugging Face | 🦜️🔗 LangChain](https://python.langchain.com/v0.2/docs/integrations/platforms/huggingface/)
+
+</aside>
