@@ -25,7 +25,7 @@ Adicionalmente para este ejemplo se instalarán los paquetes para que se pueda o
 pip install langchain_openai
 ```
 
-Todo lo anterior lo podremos instalar del repositorio:   usando:
+Todo lo anterior lo podremos instalar del repositorio: [Repositorio LangChain](https://github.com/Alejoles/LangChainTest)
 
 ### LINUX
 
